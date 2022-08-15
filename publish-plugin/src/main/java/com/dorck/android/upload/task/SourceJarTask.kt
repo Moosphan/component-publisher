@@ -7,7 +7,7 @@ import org.gradle.jvm.tasks.Jar
 
 open class SourceJarTask : Jar() {
     init {
-        archiveClassifier.set("source")
+        archiveClassifier.set("sources")
     }
 
     internal companion object {

@@ -1,9 +1,9 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-//        maven {
-//            url '../Component-publisher/publish-plugin/build/repos/releases'
-//        }
+        maven {
+            url '../Component-publisher/publish-plugin/build/repos/releases'
+        }
         google()
         mavenCentral()
         mavenLocal()
@@ -11,7 +11,7 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == 'publish-plugin') {
-                useModule("com.dorck.android.plugin:publish-plugin:1.0.1-alpha")
+                useModule("com.dorck.android.plugin:publish-plugin:1.0.2-alpha")
             }
         }
     }
@@ -20,11 +20,12 @@ dependencyResolutionManagement {
     // Fix to see: https://stackoverflow.com/questions/69163511/build-was-configured-to-prefer-settings-repositories-over-project-repositories-b
 //    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
-//        maven {
-//            url '../Component-publisher/publish-plugin/build/repos/releases'
-//        }
+        maven {
+            url '../Component-publisher/publish-plugin/build/repos/releases'
+        }
         google()
         mavenCentral()
+        maven { url "https://jitpack.io" }
         mavenLocal()
     }
 }

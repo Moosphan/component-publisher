@@ -27,6 +27,7 @@ val Project.mavenPublishExt: PublishingExtension?
     get() = extensions.findByType(PublishingExtension::class.java)
 
 val Project.defaultGroupId: String
+    // TODO: split package name from path
     get() = layout.projectDirectory.asFileTree.asPath ?: ""
 
 val Project.defaultArtifactId: String

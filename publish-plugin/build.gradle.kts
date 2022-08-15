@@ -1,5 +1,6 @@
 plugins {
     `java-gradle-plugin`
+    // kotlin dsl extensions plugin
     `kotlin-dsl`
     `maven-publish`
     id("kotlin")
@@ -26,7 +27,7 @@ gradlePlugin {
 dependencies {
     // Use gradle api
     compileOnly("com.android.tools.build:gradle:7.2.1")
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
     // Use dokka for java docs.
     compileOnly("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
     // Use JUnit test framework for unit tests
@@ -71,17 +72,17 @@ afterEvaluate {
             }
         }
         repositories {
-//            maven {
-//                val repoDir = if (version.toString().endsWith("SNAPSHOT")) {
-//                    "repos/snapshots"
-//                } else if (version.toString().endsWith("LOCAL")) {
-//                    "repos/locals"
-//                } else {
-//                    "repos/releases"
-//                }
-//                url = uri(layout.buildDirectory.dir(repoDir))
-//            }
-            mavenLocal()
+            maven {
+                val repoDir = if (version.toString().endsWith("SNAPSHOT")) {
+                    "repos/snapshots"
+                } else if (version.toString().endsWith("LOCAL")) {
+                    "repos/locals"
+                } else {
+                    "repos/releases"
+                }
+                url = uri(layout.buildDirectory.dir(repoDir))
+            }
+//            mavenLocal()
         }
     }
 }
@@ -92,7 +93,7 @@ object PluginInfo {
     const val group = "com.dorck.android.plugin"
     const val artifactId = "publish-plugin"
     const val implementationClass = "com.dorck.android.upload.ComponentUploadPlugin"
-    const val version = "1.0.1-alpha"
+    const val version = "1.0.2-alpha"
     const val displayName = "Upload library for Android"
     const val description = "Gradle plugin to publish library component quickly."
     const val url = "https://github.com/Moosphan/component-publisher.git"

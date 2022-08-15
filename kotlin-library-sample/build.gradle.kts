@@ -7,7 +7,7 @@ plugins {
 // FIXME: 2022/08/14 => Why cannot use `LOCAL` version?
 publishOptions {
     group = "com.dorck.kotlin"
-    version = "1.0.2"
+    version = "1.0.0-LOCAL"
 }
 
 java {

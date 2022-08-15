@@ -1,10 +1,12 @@
 package com.dorck.android.upload
 
 import com.dorck.android.upload.ext.*
-import groovy.namespace.QName
+import groovy.util.Node
+import groovy.util.NodeList
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Project.DEFAULT_VERSION
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.publish.maven.MavenPom
 import java.net.URI
 
@@ -66,7 +68,7 @@ class ComponentUploadPlugin : Plugin<Project> {
             println("===> start create custom upload task.")
             // Configure custom task to publish component quickly.
             project.createCustomPublishingTask {
-                printFinalPublication(publishOptions)
+                printFinalPublication(publishOptions, repositories.named("maven", MavenArtifactRepository::class.java).get())
             }
         }
     }
@@ -86,17 +88,20 @@ class ComponentUploadPlugin : Plugin<Project> {
         if (!transitiveDependency) {
             pom.withXml {
                 val rootNode = asNode()
-                val dependencyNodes = rootNode.getAt(QName("dependencies"))
+                val dependencyNodes = rootNode.get("dependencies") as NodeList
                 println("===> current dependencies: $dependencyNodes")
-                dependencyNodes.clear()
-                println("===> after remove dependencies: ${rootNode.getAt(QName("dependencies"))}")
+                if (dependencyNodes.isNotEmpty()) {
+                    rootNode.remove(dependencyNodes.first() as Node)
+                }
+                println("===> after remove dependencies pom content: \n${asString()}")
             }
         }
     }
 
-    private fun printFinalPublication(publishOptions: PublishOptionsExtension) {
+    private fun printFinalPublication(publishOptions: PublishOptionsExtension, mavenArtifactRepository: MavenArtifactRepository) {
         println("===== Component\$${publishOptions.artifactId} published succeed ======")
         println("===== Dependency url: implementation '${publishOptions.group}:${publishOptions.artifactId}:${publishOptions.version}'")
+        println("===== You published it at: ${mavenArtifactRepository.url}")
     }
 
     private fun PublishOptionsExtension.checkOrSupplementOptions(project: Project) {
