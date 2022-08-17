@@ -1,6 +1,7 @@
 package com.dorck.android.upload.publication
 
 import com.dorck.android.upload.config.JavadocJarOptions
+import com.dorck.android.upload.extensions.defaultMavenPublication
 import com.dorck.android.upload.extensions.publications
 import com.dorck.android.upload.extensions.withJavadocJar
 import com.dorck.android.upload.extensions.withSourcesJar
@@ -51,7 +52,7 @@ data class AndroidLibrarySingleVariantPublication(
             repositories {
                 google()
             }
-            publications?.create("maven", MavenPublication::class.java) {
+            publications?.create(defaultMavenPublication, MavenPublication::class.java) {
                 configure()
                 val component = components.findByName(variantName)
                     ?: throw IllegalStateException("No variant#$variantName found!")

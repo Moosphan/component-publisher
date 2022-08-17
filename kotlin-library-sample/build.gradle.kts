@@ -6,7 +6,7 @@ plugins {
 
 publishOptions {
     group = "com.dorck.kotlin"
-    version = "1.0.0-LOCAL"
+    version = "1.0.0-alpha"
 }
 
 java {

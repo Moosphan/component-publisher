@@ -1,56 +1,27 @@
 package com.dorck.android.upload
 
-import com.dorck.android.upload.extensions.defaultPwd
-import com.dorck.android.upload.extensions.defaultReleaseRepositoryUrl
-import com.dorck.android.upload.extensions.defaultSnapshotRepositoryUrl
-import com.dorck.android.upload.extensions.defaultUserName
-
 /**
  * Component upload config options extension.
  * Note: This class must be open with default constructor.
- * TODO: test for visibility of default privacy properties.
  * @author Dorck
  * @since 2022/08/13
  */
 open class PublishOptionsExtension {
+    // If empty, use project's group.
     var group: String = ""
+    // If empty, use project's name.
     var artifactId: String = ""
+    // If empty, use project's version.
     var version: String = ""
+    // If empty, use `local.properties` options.
     var userName: String = ""
-        get() {
-            if (field.isEmpty()) {
-                field = defaultUserName
-            }
-            return field
-        }
     var password: String = ""
-        get() {
-            if (field.isEmpty()) {
-                field = defaultPwd
-            }
-            return field
-        }
     var releaseRepoUrl: String = ""
-        get() {
-            if (field.isEmpty()) {
-                field = defaultReleaseRepositoryUrl
-            }
-            return field
-        }
-
     var snapshotRepoUrl: String = ""
-        get() {
-            if (field.isEmpty()) {
-                field = defaultSnapshotRepositoryUrl
-            }
-            return field
-        }
-
+    // Description written in pom file.
     var description: String = ""
-
     // Whether to package the source code.
     var packSourceCode: Boolean = true
-
     // Will transitive dependencies be required.
     var transitiveDependency: Boolean = false
 

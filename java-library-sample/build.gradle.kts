@@ -5,7 +5,7 @@ plugins {
 
 publishOptions {
     group = "com.dorck.java"
-    version = "1.0.0-LOCAL"
+    version = "1.0.1-LOCAL"
 }
 
 java {

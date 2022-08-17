@@ -1,6 +1,7 @@
 package com.dorck.android.upload.publication
 
 import com.dorck.android.upload.config.JavadocJarOptions
+import com.dorck.android.upload.extensions.defaultMavenPublication
 import com.dorck.android.upload.extensions.publications
 import com.dorck.android.upload.extensions.withJavadocJar
 import com.dorck.android.upload.extensions.withSourcesJar
@@ -34,7 +35,7 @@ data class KotlinLibraryPublication @JvmOverloads constructor(
     override fun setupPublication(project: Project, configure: MavenPublication.() -> Unit) {
         println("====> setupPublication of kt jvm lib.")
         project.run {
-            publications?.create("maven", MavenPublication::class.java) {
+            publications?.create(defaultMavenPublication, MavenPublication::class.java) {
                 configure()
                 from(components["java"])
                 println("====> configure sourceJar")

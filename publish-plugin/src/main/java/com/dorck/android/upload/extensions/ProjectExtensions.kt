@@ -15,13 +15,10 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.jetbrains.dokka.gradle.DokkaTask
+import java.io.FileNotFoundException
+import java.util.*
 
-// TODO: 2022/08/17 => 诸如repo地址并不需要用户频繁去声明，所以可以根据gradle.properties读取，优先采用extension中声明的
-internal const val defaultSnapshotRepositoryUrl = "https://www.wanlinruo.com/nexus/repository/maven-snapshots/"
-internal const val defaultReleaseRepositoryUrl = "https://www.wanlinruo.com/nexus/repository/maven-releases/"
-internal const val defaultUserName = "uploader"
-internal const val defaultPwd = "uploader"
-private const val DEFAULT_MAVEN_PUBLICATION_NAME = "maven"
+internal const val defaultMavenPublication = "maven"
 
 val Project.publications: PublicationContainer?
     get() = extensions.findByType(PublishingExtension::class.java)?.publications
@@ -87,20 +84,17 @@ fun Project.setupPlatformPublication(
 fun Project.createCustomPublishingTask(onFinish: () -> Unit) {
     tasks.register("publishComponent") {
         group = "publisher"
-        // TODO: 2022/08/14 => Confirm whether need depend on assemble task of android.
         if (isAndroidLibrary()) {
             dependsOn(tasks.named("assemble${getDefaultBuildType().formatCapitalize()}"))
         }
         // Finally execute maven publish task depends on custom task.
-        val publishTaskName = "publish" + DEFAULT_MAVEN_PUBLICATION_NAME.formatCapitalize() +
-                "PublicationTo" + DEFAULT_MAVEN_PUBLICATION_NAME.formatCapitalize() + "Repository"
+        val publishTaskName = "publish" + defaultMavenPublication.formatCapitalize() +
+                "PublicationTo" + defaultMavenPublication.formatCapitalize() + "Repository"
         val realMavenPublishTask = tasks.named(publishTaskName)
-        realMavenPublishTask.get()?.let {
-            finalizedBy(realMavenPublishTask)
-        }.also {
-            doLast {
-                onFinish()
-            }
+        realMavenPublishTask.get().also {
+            finalizedBy(it)
+        }.doLast {
+            onFinish()
         }
     }
 }
@@ -115,12 +109,12 @@ fun Project.javaLibraryComponent(): JavaPluginExtension? =
 
 /**
  * Obtain app module(com.android.application) like this:
- * <code>
+ * ```
  * android {
  *  buildTypes {}
  *  defaultConfig {}
  * }
- * </code>
+ * ```
  */
 fun Project.androidProject(): AppExtension =
     extensions.getByType(AppExtension::class.java)
@@ -130,6 +124,24 @@ fun Project.androidProject(): AppExtension =
  */
 fun Project.libraryProject(): LibraryExtension? =
     extensions.findByType(LibraryExtension::class.java)
+
+// Get property from `gradle.properties`.
+internal fun Project.findOptionalProperty(key: String): String? = findProperty(key)?.toString()
+
+// Get properties from `local.properties` or other custom `xx.properties` file.
+internal fun Project.loadPropertiesFile(fileName: String = "local.properties"): Properties {
+    // Load file
+    val propertiesFile = file(fileName)
+    if (!propertiesFile.exists()) {
+        throw FileNotFoundException(
+            "The file '${propertiesFile.absolutePath}' could not be found"
+        )
+    }
+    // Load contents into properties object
+    val properties = Properties()
+    properties.load(propertiesFile.inputStream())
+    return properties
+}
 
 enum class PlatformModule {
     ANDROID_APPLICATION,

@@ -2,6 +2,7 @@ package com.dorck.android.publish
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.dorck.android.library.sample.SimpleFragment
 import com.dorck.kotlin.library.sample.MyKotlinClass
 
 class MainActivity : AppCompatActivity() {
@@ -9,5 +10,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         MyKotlinClass().doSomething()
+        SimpleFragment().activity
     }
 }

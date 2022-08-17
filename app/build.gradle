@@ -42,4 +42,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     implementation 'com.dorck.kotlin:kotlin-library-sample:1.0.0-LOCAL'
+    implementation 'com.dorck.android:android-library-sample:0.1.0'
 }

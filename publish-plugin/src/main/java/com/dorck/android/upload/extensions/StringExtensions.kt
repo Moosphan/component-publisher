@@ -8,3 +8,10 @@ fun String.formatCapitalize(): String {
 inline fun String.replaceFirstCharacter(transform: (Char) -> CharSequence): String {
     return if (isNotEmpty()) transform(this[0]).toString() + substring(1) else this
 }
+
+fun String.takeIfBlank(elseValue: () -> String?): String {
+    if (isNotBlank()) {
+        return this
+    }
+    return elseValue() ?: ""
+}

@@ -17,12 +17,19 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    // Fix to see: https://stackoverflow.com/questions/69163511/build-was-configured-to-prefer-settings-repositories-over-project-repositories-b
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
         maven { url "https://jitpack.io" }
+        maven {
+            name 'GithubRepo'
+            url 'https://maven.pkg.github.com/Moosphan/MavenRepo'
+            credentials {
+                username 'Moosphan'
+                password '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'
+            }
+        }
         maven {
             url '../Component-publisher/publish-plugin/build/repos/releases'
         }

@@ -35,7 +35,7 @@ android {
 
 publishOptions {
     group = "com.dorck.android"
-    version = "1.0.0-LOCAL"
+    version = "0.1.0"
 }
 
 dependencies {

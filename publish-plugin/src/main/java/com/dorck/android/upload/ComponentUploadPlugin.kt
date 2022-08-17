@@ -1,5 +1,6 @@
 package com.dorck.android.upload
 
+import com.dorck.android.upload.config.Constants
 import com.dorck.android.upload.extensions.*
 import groovy.util.Node
 import groovy.util.NodeList
@@ -40,8 +41,8 @@ class ComponentUploadPlugin : Plugin<Project> {
 
     private fun setupLibraryMavenPublishing(project: Project, publishOptions: PublishOptionsExtension) {
         publishOptions.checkOrSupplementOptions(project)
+        println("===> final publishOptions: $publishOptions")
         project.mavenPublishingDsl {
-            println("===> start config maven publishing repos.")
             // Configure maven repositories.
             repositories.maven {
                 val isLocalPublish = publishOptions.version.endsWith("-LOCAL")
@@ -68,7 +69,7 @@ class ComponentUploadPlugin : Plugin<Project> {
             }
             // Configure custom task to publish component quickly.
             project.createCustomPublishingTask {
-                printFinalPublication(publishOptions, repositories.named("maven", MavenArtifactRepository::class.java).get())
+                printFinalPublication(publishOptions, repositories.named(defaultMavenPublication, MavenArtifactRepository::class.java).get())
             }
         }
     }
@@ -81,9 +82,6 @@ class ComponentUploadPlugin : Plugin<Project> {
         makeUpComponentDependencies(pom, publishOptions.transitiveDependency)
     }
 
-    /**
-     * Todo: 2022/08/14 => Need confirm that dependency is transitive.
-     */
     private fun makeUpComponentDependencies(pom: MavenPom, transitiveDependency: Boolean) {
         if (!transitiveDependency) {
             pom.withXml {
@@ -108,20 +106,19 @@ class ComponentUploadPlugin : Plugin<Project> {
     }
 
     private fun PublishOptionsExtension.checkOrSupplementOptions(project: Project) {
-        if (group.isEmpty()) {
-            group = project.defaultGroupId
-            println("===> lost option of [publishOptions\$group], use [$group] by default.")
-        }
-        if (artifactId.isEmpty()) {
-            artifactId = project.defaultArtifactId
-            println("===> lost option of [publishOptions\$artifactId], use [$artifactId] by default.")
-        }
+        group = group.takeIfBlank { project.defaultGroupId }
+        artifactId = artifactId.takeIfBlank { project.defaultArtifactId }
         if (version.isEmpty()) {
             if (project.version.toString().isEmpty() || DEFAULT_VERSION == project.version.toString()) {
                 throw IllegalArgumentException("You must specified version in ${project.name} publishOptions.")
             }
             version = project.version.toString()
-            println("===> lost option of [publishOptions\$version], use [$version] by default.")
         }
+        // Select publish options first, if parameter is empty, use `local.properties` instead.
+        val defaultProperties = project.rootProject.loadPropertiesFile()
+        userName = userName.takeIfBlank { defaultProperties.getProperty(Constants.REPOSITORY_USERNAME_KEY) }
+        password = password.takeIfBlank { defaultProperties.getProperty(Constants.REPOSITORY_PASSWORD_KEY) }
+        releaseRepoUrl = releaseRepoUrl.takeIfBlank { defaultProperties.getProperty(Constants.REPOSITORY_RELEASE_URL) }
+        snapshotRepoUrl = snapshotRepoUrl.takeIfBlank { defaultProperties.getProperty(Constants.REPOSITORY_SNAPSHOT_URL) }
     }
 }
