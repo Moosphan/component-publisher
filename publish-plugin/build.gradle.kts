@@ -3,10 +3,11 @@ plugins {
     // kotlin dsl extensions plugin
     `kotlin-dsl`
     `maven-publish`
-    id("kotlin")
 }
 
 java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
     withJavadocJar()
     withSourcesJar()
 }
@@ -26,12 +27,14 @@ gradlePlugin {
 
 dependencies {
     // Use gradle api
-    compileOnly("com.android.tools.build:gradle:7.2.1")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
+    implementation(gradleApi())
+    compileOnly("com.android.tools.build:gradle:4.0.0")
+    compileOnly(kotlin("stdlib"))
     // Use dokka for java docs.
     compileOnly("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
     // Use JUnit test framework for unit tests
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
 }
 
 afterEvaluate {

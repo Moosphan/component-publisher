@@ -1,53 +1,63 @@
-package com.dorck.android.upload.ext
+package com.dorck.android.upload.extensions
 
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
-import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
-import com.dorck.android.upload.PublishOptionsExtension
+import com.dorck.android.upload.config.JavadocJarOptions
+import com.dorck.android.upload.publication.*
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.publish.PublicationContainer
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
-import org.gradle.kotlin.dsl.existing
-import org.gradle.kotlin.dsl.findByType
 import org.jetbrains.dokka.gradle.DokkaTask
 
+// TODO: 2022/08/17 => 诸如repo地址并不需要用户频繁去声明，所以可以根据gradle.properties读取，优先采用extension中声明的
 internal const val defaultSnapshotRepositoryUrl = "https://www.wanlinruo.com/nexus/repository/maven-snapshots/"
 internal const val defaultReleaseRepositoryUrl = "https://www.wanlinruo.com/nexus/repository/maven-releases/"
 internal const val defaultUserName = "uploader"
 internal const val defaultPwd = "uploader"
+private const val DEFAULT_MAVEN_PUBLICATION_NAME = "maven"
 
-val Project.mavenPublishExt: PublishingExtension?
-    get() = extensions.findByType(PublishingExtension::class.java)
+val Project.publications: PublicationContainer?
+    get() = extensions.findByType(PublishingExtension::class.java)?.publications
 
 val Project.defaultGroupId: String
     // TODO: split package name from path
-    get() = layout.projectDirectory.asFileTree.asPath ?: ""
+    get() = group.toString().takeIf(String::isNotBlank)?.takeUnless {
+        it == rootProject.name || it.startsWith("${rootProject.name}.")
+    } ?: parent?.defaultGroupId /*?: layout.projectDirectory.asFileTree.asPath */ ?: throw GradleException("unspecified project group")
 
 val Project.defaultArtifactId: String
     get() = name
 
 fun Project.isAndroidApp(): Boolean =
-    moduleType == ModuleType.ANDROID_APPLICATION
+    platformModule == PlatformModule.ANDROID_APPLICATION
 
 fun Project.isAndroidLibrary(): Boolean =
-    moduleType == ModuleType.ANDROID_LIBRARY
+    platformModule == PlatformModule.ANDROID_LIBRARY
 
-val Project.moduleType: ModuleType
-    get() = if (androidAppComponent() != null) {
-        ModuleType.ANDROID_APPLICATION
-    } else if (androidLibraryComponent() != null) {
-        ModuleType.ANDROID_LIBRARY
-    } else if (javaLibraryComponent() != null) {
-        ModuleType.JAVA_LIBRARY
-    } else {
-        ModuleType.OTHER
+val Project.platformModule: PlatformModule?
+    get() = when {
+        plugins.hasPlugin("com.android.application") ->
+            PlatformModule.ANDROID_APPLICATION
+        plugins.hasPlugin("com.android.library") ->
+            PlatformModule.ANDROID_LIBRARY
+        plugins.hasPlugin("java-library") || plugins.hasPlugin("java") ->
+            PlatformModule.JAVA_LIBRARY
+        plugins.hasPlugin("org.jetbrains.kotlin.jvm") ->
+            PlatformModule.KOTLIN_LIBRARY
+        plugins.hasPlugin("java-gradle-plugin") ->
+            PlatformModule.GRADLE_PLUGIN
+        plugins.hasPlugin("org.jetbrains.kotlin.js") ->
+            PlatformModule.KOTLIN_JS_LIBRARY
+        plugins.hasPlugin("org.jetbrains.kotlin.multiplatform") ->
+            PlatformModule.KOTLIN_MULTI_PLATFORM
+        else -> null
     }
 
 /**
@@ -62,25 +72,16 @@ fun Project.setupPlatformPublication(
     packSourceCode: Boolean,
     configure: MavenPublication.() -> Unit
 ) {
-    val platformMavenPublication: PlatformPublication = when {
-        plugins.hasPlugin("org.jetbrains.kotlin.multiplatform") ->
-            KotlinMultiplatform(defaultJavaDocOptions())
-        plugins.hasPlugin("com.android.library") ->
-            if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
-                AndroidLibraryWithMultiVariant(packSourceCode)
-            } else AndroidLibraryWithSingleVariant(packSourceJar = packSourceCode)
-        plugins.hasPlugin("java-gradle-plugin") ->
-            GradlePlugin(defaultJavaDocOptions(), packSourceCode)
-        plugins.hasPlugin("org.jetbrains.kotlin.jvm") ->
-            KotlinJvm(defaultJavaDocOptions(), packSourceCode)
-        plugins.hasPlugin("org.jetbrains.kotlin.js") ->
-            KotlinJs(defaultJavaDocOptions(), packSourceCode)
-        plugins.hasPlugin("java-library") || plugins.hasPlugin("java")->
-            JavaLibrary(defaultJavaDocOptions(), packSourceCode)
-        else ->
-            NoSupportedPlatformPublication("No compatible plugin found in project $name for publishing.")
+    val platformPublication: PlatformPublication = when(platformModule) {
+        PlatformModule.JAVA_LIBRARY -> JavaLibraryPublication(defaultJavaDocOptions(),packSourceCode)
+        PlatformModule.KOTLIN_LIBRARY -> KotlinLibraryPublication(defaultJavaDocOptions(), packSourceCode)
+        PlatformModule.GRADLE_PLUGIN -> GradlePluginPublication(defaultJavaDocOptions(), packSourceCode)
+        PlatformModule.ANDROID_LIBRARY -> AndroidLibrarySingleVariantPublication("release", false)
+        PlatformModule.KOTLIN_JS_LIBRARY -> KotlinJsPublication(defaultJavaDocOptions(), packSourceCode)
+        PlatformModule.KOTLIN_MULTI_PLATFORM -> KotlinMultiplatformPublication(defaultJavaDocOptions())
+        else -> NoneSupportedPublication("Other platform libraries not supported yet.")
     }
-    platformMavenPublication.setupPublication(this, configure)
+    platformPublication.setupPublication(this, configure)
 }
 
 fun Project.createCustomPublishingTask(onFinish: () -> Unit) {
@@ -88,7 +89,7 @@ fun Project.createCustomPublishingTask(onFinish: () -> Unit) {
         group = "publisher"
         // TODO: 2022/08/14 => Confirm whether need depend on assemble task of android.
         if (isAndroidLibrary()) {
-            dependsOn(tasks.named("assemble${getDefaultBuildType()}"))
+            dependsOn(tasks.named("assemble${getDefaultBuildType().formatCapitalize()}"))
         }
         // Finally execute maven publish task depends on custom task.
         val publishTaskName = "publish" + DEFAULT_MAVEN_PUBLICATION_NAME.formatCapitalize() +
@@ -109,12 +110,6 @@ fun Project.mavenPublishingDsl(action: Action<PublishingExtension>) {
     extensions.configure(PublishingExtension::class.java, action)
 }
 
-fun Project.androidAppComponent(): ApplicationAndroidComponentsExtension? =
-    extensions.findByType(ApplicationAndroidComponentsExtension::class.java)
-
-fun Project.androidLibraryComponent(): LibraryAndroidComponentsExtension? =
-    extensions.findByType(LibraryAndroidComponentsExtension::class.java)
-
 fun Project.javaLibraryComponent(): JavaPluginExtension? =
     extensions.findByType(JavaPluginExtension::class.java)
 
@@ -127,8 +122,8 @@ fun Project.javaLibraryComponent(): JavaPluginExtension? =
  * }
  * </code>
  */
-fun Project.androidProject(): AppExtension? =
-    extensions.findByType(AppExtension::class.java)
+fun Project.androidProject(): AppExtension =
+    extensions.getByType(AppExtension::class.java)
 
 /**
  * Obtain library module(com.android.library).
@@ -136,11 +131,14 @@ fun Project.androidProject(): AppExtension? =
 fun Project.libraryProject(): LibraryExtension? =
     extensions.findByType(LibraryExtension::class.java)
 
-enum class ModuleType {
+enum class PlatformModule {
     ANDROID_APPLICATION,
     ANDROID_LIBRARY,
     JAVA_LIBRARY,
-    OTHER
+    KOTLIN_LIBRARY,
+    GRADLE_PLUGIN,
+    KOTLIN_JS_LIBRARY,
+    KOTLIN_MULTI_PLATFORM
     // Others see here:
     // https://docs.gradle.org/current/userguide/build_init_plugin.html#supported_gradle_build_types
 }

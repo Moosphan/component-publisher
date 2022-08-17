@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("publish-plugin")
 }
 
 android {
@@ -30,6 +31,11 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+publishOptions {
+    group = "com.dorck.android"
+    version = "1.0.0-LOCAL"
 }
 
 dependencies {

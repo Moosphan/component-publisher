@@ -1,9 +1,9 @@
 package com.dorck.android.upload
 
-import com.dorck.android.upload.ext.defaultPwd
-import com.dorck.android.upload.ext.defaultReleaseRepositoryUrl
-import com.dorck.android.upload.ext.defaultSnapshotRepositoryUrl
-import com.dorck.android.upload.ext.defaultUserName
+import com.dorck.android.upload.extensions.defaultPwd
+import com.dorck.android.upload.extensions.defaultReleaseRepositoryUrl
+import com.dorck.android.upload.extensions.defaultSnapshotRepositoryUrl
+import com.dorck.android.upload.extensions.defaultUserName
 
 /**
  * Component upload config options extension.

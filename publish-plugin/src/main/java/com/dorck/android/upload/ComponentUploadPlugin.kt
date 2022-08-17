@@ -1,6 +1,6 @@
 package com.dorck.android.upload
 
-import com.dorck.android.upload.ext.*
+import com.dorck.android.upload.extensions.*
 import groovy.util.Node
 import groovy.util.NodeList
 import org.gradle.api.Plugin
@@ -18,7 +18,7 @@ import java.net.URI
  */
 class ComponentUploadPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        val moduleType = target.moduleType
+        val moduleType = target.platformModule
         println("===> start apply upload plugin with module type: $moduleType.")
         // Skip application module.
         if (target.isAndroidApp()) {
@@ -44,28 +44,28 @@ class ComponentUploadPlugin : Plugin<Project> {
             println("===> start config maven publishing repos.")
             // Configure maven repositories.
             repositories.maven {
+                val isLocalPublish = publishOptions.version.endsWith("-LOCAL")
                 val repoUri: URI = if (publishOptions.version.endsWith("-SNAPSHOT")) {
                     URI.create(publishOptions.snapshotRepoUrl)
-                } else if (publishOptions.version.endsWith("-LOCAL")) {
+                } else if (isLocalPublish) {
                     project.repositories.mavenLocal().url
                 } else {
                     URI.create(publishOptions.releaseRepoUrl)
                 }
                 url = repoUri
-                credentials.username = publishOptions.userName
-                credentials.password = publishOptions.password
+                if (!isLocalPublish) {
+                    credentials.username = publishOptions.userName
+                    credentials.password = publishOptions.password
+                }
             }
-            println("===> start make maven publishing artifacts.")
             // Set up publication info and custom artifacts.
             project.setupPlatformPublication(publishOptions.packSourceCode) {
-                println("====> start configure MavenPublication.")
                 groupId = publishOptions.group
                 artifactId = publishOptions.artifactId
                 version = publishOptions.version
                 // Write component info into pom file.
                 configurePomXml(pom, publishOptions)
             }
-            println("===> start create custom upload task.")
             // Configure custom task to publish component quickly.
             project.createCustomPublishingTask {
                 printFinalPublication(publishOptions, repositories.named("maven", MavenArtifactRepository::class.java).get())
@@ -89,19 +89,22 @@ class ComponentUploadPlugin : Plugin<Project> {
             pom.withXml {
                 val rootNode = asNode()
                 val dependencyNodes = rootNode.get("dependencies") as NodeList
-                println("===> current dependencies: $dependencyNodes")
                 if (dependencyNodes.isNotEmpty()) {
                     rootNode.remove(dependencyNodes.first() as Node)
                 }
-                println("===> after remove dependencies pom content: \n${asString()}")
             }
         }
     }
 
     private fun printFinalPublication(publishOptions: PublishOptionsExtension, mavenArtifactRepository: MavenArtifactRepository) {
-        println("===== Component\$${publishOptions.artifactId} published succeed ======")
-        println("===== Dependency url: implementation '${publishOptions.group}:${publishOptions.artifactId}:${publishOptions.version}'")
-        println("===== You published it at: ${mavenArtifactRepository.url}")
+        println("""
+            ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+            |                                           Your component published succeed!
+            | Component artifactId: ${publishOptions.artifactId}
+            | Component dependency url: implementation '${publishOptions.group}:${publishOptions.artifactId}:${publishOptions.version}'
+            | Published at: ${mavenArtifactRepository.url}
+            └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        """.trimIndent())
     }
 
     private fun PublishOptionsExtension.checkOrSupplementOptions(project: Project) {
@@ -115,11 +118,10 @@ class ComponentUploadPlugin : Plugin<Project> {
         }
         if (version.isEmpty()) {
             if (project.version.toString().isEmpty() || DEFAULT_VERSION == project.version.toString()) {
-                //throw IllegalArgumentException("You must specified version in ${project.name} publishOptions.")
+                throw IllegalArgumentException("You must specified version in ${project.name} publishOptions.")
             }
             version = project.version.toString()
             println("===> lost option of [publishOptions\$version], use [$version] by default.")
         }
-        println("===> real [publishOptions\$version] is [$version]")
     }
 }

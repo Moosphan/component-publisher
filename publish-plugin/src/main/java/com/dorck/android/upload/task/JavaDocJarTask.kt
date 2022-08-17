@@ -1,7 +1,9 @@
 package com.dorck.android.upload.task
 
-import com.dorck.android.upload.ext.JavadocJarOptions
+import com.dorck.android.upload.config.JavadocJarOptions
+import com.dorck.android.upload.extensions.formatCapitalize
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 
@@ -21,17 +23,17 @@ open class JavaDocJarTask : Jar() {
         }
 
         private fun Project.emptyJavaDocJar(): TaskProvider<*> =
-            tasks.register("emptyJavadocJar", JavaDocJarTask::class.java)
+            tasks.register("emptyJavadocJarFor${name.formatCapitalize()}", JavaDocJarTask::class.java)
 
         private fun Project.simpleJavadocJar(): TaskProvider<*> =
-            tasks.register("simpleJavadocJar", JavaDocJarTask::class.java) {
-                val task = tasks.named("javadoc")
+            tasks.register("simpleJavadocJarFor${name.formatCapitalize()}", JavaDocJarTask::class.java) {
+                val task = tasks.named(JavaPlugin.JAVADOC_TASK_NAME)
                 dependsOn(task)
                 from(task)
             }
 
         private fun Project.dokkaJavadocJar(dokka: JavadocJarOptions.Dokka): TaskProvider<*> =
-            tasks.register("dokkaJavadocJar", JavaDocJarTask::class.java) {
+            tasks.register("dokkaJavadocJarFor${name.formatCapitalize()}", JavaDocJarTask::class.java) {
                 val task = tasks.named(dokka.taskName)
                 dependsOn(task)
                 from(task)

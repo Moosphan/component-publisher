@@ -1,4 +1,4 @@
-package com.dorck.android.upload.ext
+package com.dorck.android.upload.extensions
 
 
 fun String.formatCapitalize(): String {

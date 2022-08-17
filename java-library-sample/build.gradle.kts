@@ -1,5 +1,11 @@
 plugins {
     id("java-library")
+    id("publish-plugin")
+}
+
+publishOptions {
+    group = "com.dorck.java"
+    version = "1.0.0-LOCAL"
 }
 
 java {

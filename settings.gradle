@@ -1,11 +1,11 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        google()
+        mavenCentral()
         maven {
             url '../Component-publisher/publish-plugin/build/repos/releases'
         }
-        google()
-        mavenCentral()
         mavenLocal()
     }
     resolutionStrategy {
@@ -18,14 +18,14 @@ pluginManagement {
 }
 dependencyResolutionManagement {
     // Fix to see: https://stackoverflow.com/questions/69163511/build-was-configured-to-prefer-settings-repositories-over-project-repositories-b
-//    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
-        maven {
-            url '../Component-publisher/publish-plugin/build/repos/releases'
-        }
         google()
         mavenCentral()
         maven { url "https://jitpack.io" }
+        maven {
+            url '../Component-publisher/publish-plugin/build/repos/releases'
+        }
         mavenLocal()
     }
 }
