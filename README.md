@@ -6,6 +6,7 @@
 
 - Publish this plugin onto gradle plugin portal.
 - Improvement of usage doc.
+- Run the publication task with project properties of repo configurations.
 
 ## Features
 
@@ -44,7 +45,7 @@ As shown above, you will publish `sample-library` component into `mavenLocal()` 
 Currently, it supports the following more configuration properties:
 
 | Option               | Description                                                  |
-| -------------------- | ------------------------------------------------------------ |
+| :------------------- | :----------------------------------------------------------- |
 | group                | The group of maven publication. If empty, use project's group. |
 | artifactId           | The artifactId of maven publication. If empty, use project's name. |
 | version              | The version of maven publication. If empty, use project's version. |
@@ -68,17 +69,15 @@ $ ./gradlew :<component module name>:publishComponent
 
 Next you will see the following log output from the terminal:
 
-```
-
-```
+<img src="./arts/component_output.png" alt="component_output" style="zoom:50%;" />
 
 #### 4. Configure stable options
 
 Normally, our repository urls and credentials information are the same for different components. To prevent repeated configuration, a global default options properties file is supported here. You can just put your global properties in root project `local.properties` like this:
 
-```groovy
+```properties
 REPO_USER=Moosphan
-REPO_PASSWORD=**215126
+REPO_PASSWORD=*****
 REPO_RELEASE_URL=https://maven.xx.xx/repository/releases/
 REPO_SNAPSHOT_URL=https://maven.xx.xx/repository/snapshots/
 ```
