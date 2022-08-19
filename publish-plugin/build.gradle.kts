@@ -1,8 +1,11 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     `java-gradle-plugin`
     // kotlin dsl extensions plugin
     `kotlin-dsl`
     `maven-publish`
+    signing
 }
 
 java {
@@ -76,27 +79,36 @@ afterEvaluate {
         }
         repositories {
             maven {
-                val repoDir = if (version.toString().endsWith("SNAPSHOT")) {
-                    "repos/snapshots"
+                val repoUrl = if (version.toString().endsWith("SNAPSHOT")) {
+                    "https://s01.oss.sonatype.org/content/repositories/snapshots/"
                 } else if (version.toString().endsWith("LOCAL")) {
-                    "repos/locals"
+                    layout.buildDirectory.dir("repos/locals").get().asFile.path
                 } else {
-                    "repos/releases"
+                    "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
                 }
-                url = uri(layout.buildDirectory.dir(repoDir))
+                url = uri(repoUrl)
+                val properties = gradleLocalProperties(rootDir)
+                credentials {
+                    username = properties.getProperty("OSSRH_USERNAME")
+                    password = properties.getProperty("OSSRH_PASSWORD")
+                }
             }
 //            mavenLocal()
         }
     }
 }
 
+signing {
+    sign(publishing.publications)
+}
+
 object PluginInfo {
-    const val id = "publish-plugin"
+    const val id = "component-publisher"
     const val name = "componentPublishPlugin"
-    const val group = "com.dorck.android.plugin"
-    const val artifactId = "publish-plugin"
+    const val group = "cn.dorck.android"
+    const val artifactId = "component-publisher"
     const val implementationClass = "com.dorck.android.upload.ComponentUploadPlugin"
-    const val version = "1.0.2-alpha"
+    const val version = "1.0.0"
     const val displayName = "Upload library for Android"
     const val description = "Gradle plugin to publish library component quickly."
     const val url = "https://github.com/Moosphan/component-publisher.git"
