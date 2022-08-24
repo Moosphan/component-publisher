@@ -1,6 +1,8 @@
-## component-publisher
+## Component Publisher
 
  A Gradle plugin to easily publish components based on maven-publish. 
+
+> *Latest release version: **1.0.0***
 
 ## Todo
 
@@ -20,11 +22,11 @@
 You can quickly publish your own components by following steps with this plugin.
 #### 1. Apply plugin
 
-You need enable `cn.dorck.android.publisher` in `build.gradle`:
+You need apply `cn.dorck.component.publisher` in `build.gradle`:
 
 ```kotlin
 plugins {
-    id("cn.dorck.android.publisher")
+  id("cn.dorck.component.publisher") version "1.0.0"
 }
 ```
 
@@ -84,3 +86,6 @@ REPO_SNAPSHOT_URL=https://maven.xx.xx/repository/snapshots/
 
 > If you want to specify repo options for a component, just add repo info in its `build.gradle` >> `publishOptions` DSL.
 
+### Article Reference
+
+- [*Gradle 发布插件的前世今生*](https://dorck.cn/gradle/2022/08/20/component-publication-plugin/)
