@@ -1,7 +1,7 @@
 plugins {
     id("java-library")
     id("org.jetbrains.kotlin.jvm")
-    id("publish-plugin")
+    id("cn.dorck.component.publisher") version "1.0.0"
 }
 
 publishOptions {

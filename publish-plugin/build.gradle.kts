@@ -5,7 +5,8 @@ plugins {
     // kotlin dsl extensions plugin
     `kotlin-dsl`
     `maven-publish`
-    signing
+//    signing
+    id("com.gradle.plugin-publish") version "1.0.0-rc-1"
 }
 
 java {
@@ -13,6 +14,15 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
     withJavadocJar()
     withSourcesJar()
+}
+
+group = PluginInfo.group
+version = PluginInfo.version
+
+pluginBundle {
+    website = "https://github.com/Moosphan/component-publisher"
+    vcsUrl = "https://github.com/Moosphan/component-publisher.git"
+    tags = listOf("component publication", "publish library", "maven-publish", "android-library", "kotlin-library")
 }
 
 gradlePlugin {
@@ -98,14 +108,15 @@ afterEvaluate {
     }
 }
 
-signing {
-    sign(publishing.publications)
-}
+// If apply plugin `com.gradle.plugin-publish`, no need apply `signing` plugin.
+//signing {
+//    sign(publishing.publications)
+//}
 
 object PluginInfo {
-    const val id = "component-publisher"
+    const val id = "cn.dorck.component.publisher"
     const val name = "componentPublishPlugin"
-    const val group = "cn.dorck.android"
+    const val group = "cn.dorck"
     const val artifactId = "component-publisher"
     const val implementationClass = "com.dorck.android.upload.ComponentUploadPlugin"
     const val version = "1.0.0"
