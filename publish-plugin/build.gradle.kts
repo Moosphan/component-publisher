@@ -18,10 +18,13 @@ ext["ossrh.username"] = null
 ext["ossrh.password"] = null
 
 // We can get secrets from local.properties or system env.
-val properties = gradleLocalProperties(rootDir)
-if (properties.isNotEmpty()) {
-    properties.onEach { (key, value) ->
-        ext[key.toString()] = value
+val localPropsFile = project.rootProject.file(com.android.SdkConstants.FN_LOCAL_PROPERTIES)
+if (localPropsFile.exists()) {
+    val properties = gradleLocalProperties(rootDir)
+    if (properties.isNotEmpty()) {
+        properties.onEach { (key, value) ->
+            ext[key.toString()] = value
+        }
     }
 } else {
     ext["signing.keyId"] = System.getenv("GPG_KEY_ID")
