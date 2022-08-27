@@ -1,5 +1,7 @@
 ## Component Publisher
 
+[![Maven Central](https://img.shields.io/maven-central/v/cn.dorck.android/component-publisher?style=flat-square)](https://search.maven.org/artifact/cn.dorck.android/component-publisher)[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/cn.dorck.component.publisher?style=flat-square)](https://plugins.gradle.org/plugin/cn.dorck.component.publisher)[![License](https://img.shields.io/badge/license-apache2.0-blue?style=flat-square.svg)](https://opensource.org/licenses/Apache-2.0)
+
  A Gradle plugin to easily publish components based on maven-publish. 
 
 > *Latest release version: **1.0.0***
