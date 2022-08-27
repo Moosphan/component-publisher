@@ -3,12 +3,16 @@
  A Gradle plugin to easily publish components based on maven-publish. 
 
 > *Latest release version: **1.0.0***
+>
+> *You can find the latest released plugin on [Gradle Plugin Portal](https://plugins.gradle.org/plugin/cn.dorck.component.publisher).*
 
 ## Todo
 
-- Publish this plugin onto gradle plugin portal.
-- Improvement of usage doc.
-- Run the publication task with project properties of repo configurations.
+- [x] Publish this plugin onto gradle plugin portal.
+- [x] Improvement of usage doc.
+- [ ] Run the publication task with options by project properties.
+- [ ] Support signing artifacts before publishing.
+- [ ] Import GitHub Actions for automatically publishing.
 
 ## Features
 

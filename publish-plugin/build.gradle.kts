@@ -2,11 +2,35 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     `java-gradle-plugin`
-    // kotlin dsl extensions plugin
     `kotlin-dsl`
     `maven-publish`
 //    signing
     id("com.gradle.plugin-publish") version "1.0.0-rc-1"
+}
+
+// Load and configure secrets of publication.
+ext["signing.keyId"] = null
+ext["signing.password"] = null
+ext["signing.secretKeyRingFile"] = null
+ext["gradle.publish.key"] = null
+ext["gradle.publish.secret"] = null
+ext["ossrh.username"] = null
+ext["ossrh.password"] = null
+
+// We can get secrets from local.properties or system env.
+val properties = gradleLocalProperties(rootDir)
+if (properties.isNotEmpty()) {
+    properties.onEach { (key, value) ->
+        ext[key.toString()] = value
+    }
+} else {
+    ext["signing.keyId"] = System.getenv("GPG_KEY_ID")
+    ext["signing.password"] = System.getenv("GPG_PASSWORD")
+    ext["signing.secretKeyRingFile"] = System.getenv("GPG_SECRET_KEY_RING_FILE")
+    ext["gradle.publish.key"] = System.getenv("GRADLE_PUBLISH_KEY")
+    ext["gradle.publish.secret"] = System.getenv("GRADLE_PUBLISH_SECRET")
+    ext["ossrh.username"] = System.getenv("OSSRH_USERNAME")
+    ext["ossrh.password"] = System.getenv("OSSRH_PASSWORD")
 }
 
 java {
@@ -89,21 +113,22 @@ afterEvaluate {
         }
         repositories {
             maven {
+                val isLocal = version.toString().endsWith("LOCAL")
                 val repoUrl = if (version.toString().endsWith("SNAPSHOT")) {
                     "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-                } else if (version.toString().endsWith("LOCAL")) {
+                } else if (isLocal) {
                     layout.buildDirectory.dir("repos/locals").get().asFile.path
                 } else {
                     "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
                 }
                 url = uri(repoUrl)
-                val properties = gradleLocalProperties(rootDir)
-                credentials {
-                    username = properties.getProperty("OSSRH_USERNAME")
-                    password = properties.getProperty("OSSRH_PASSWORD")
+                if (!isLocal) {
+                    credentials {
+                        username = this@afterEvaluate.ext["ossrh.username"].toString()
+                        password = this@afterEvaluate.ext["ossrh.password"].toString()
+                    }
                 }
             }
-//            mavenLocal()
         }
     }
 }

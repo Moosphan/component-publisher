@@ -4,14 +4,14 @@ pluginManagement {
         google()
         mavenCentral()
         maven {
-            url '../Component-publisher/publish-plugin/build/repos/releases'
+            url '../Component-publisher/publish-plugin/build/repos/locals'
         }
         mavenLocal()
     }
     /*resolutionStrategy {
         eachPlugin {
-            if (requested.id.id == 'cn.dorck.component.publisher') {
-                useModule("com.dorck.android.plugin:component-publisher:1.0.0")
+            if (requested.id.id == 'cn.dorck.android.publisher') {
+                useModule("cn.dorck:component-publisher:1.0.0-LOCAL")
             }
         }
     }*/
@@ -31,7 +31,7 @@ dependencyResolutionManagement {
             }
         }
         maven {
-            url '../Component-publisher/publish-plugin/build/repos/releases'
+            url '../Component-publisher/publish-plugin/build/repos/locals'
         }
         mavenLocal()
     }
