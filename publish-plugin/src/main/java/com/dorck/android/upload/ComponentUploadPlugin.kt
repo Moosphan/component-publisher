@@ -34,14 +34,14 @@ class ComponentUploadPlugin : Plugin<Project> {
             .create("publishOptions", PublishOptionsExtension::class.java)
         // Begin to config publish dsl.
         target.afterEvaluate {
-            println("===> publishOptions config: $publishOptionsExtension")
+            //println("===> publishOptions config: $publishOptionsExtension")
             setupLibraryMavenPublishing(this, publishOptionsExtension)
         }
     }
 
     private fun setupLibraryMavenPublishing(project: Project, publishOptions: PublishOptionsExtension) {
         publishOptions.checkOrSupplementOptions(project)
-        println("===> final publishOptions: $publishOptions")
+        //println("===> final publishOptions: $publishOptions")
         project.mavenPublishingDsl {
             // Configure maven repositories.
             repositories.maven {
