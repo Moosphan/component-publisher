@@ -1,7 +1,7 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("cn.dorck.component.publisher") version "1.0.0"
+    id("cn.dorck.component.publisher") version "1.0.1"
 }
 
 android {

@@ -15,3 +15,5 @@ fun String.takeIfBlank(elseValue: () -> String?): String {
     }
     return elseValue() ?: ""
 }
+
+fun String.checkIfLocalVersion(): Boolean = endsWith("-LOCAL")

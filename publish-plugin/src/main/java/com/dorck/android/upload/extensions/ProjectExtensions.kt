@@ -129,13 +129,14 @@ fun Project.libraryProject(): LibraryExtension? =
 internal fun Project.findOptionalProperty(key: String): String? = findProperty(key)?.toString()
 
 // Get properties from `local.properties` or other custom `xx.properties` file.
-internal fun Project.loadPropertiesFile(fileName: String = "local.properties"): Properties {
+internal fun Project.loadPropertiesFile(fileName: String = "local.properties"): Properties? {
     // Load file
     val propertiesFile = file(fileName)
     if (!propertiesFile.exists()) {
-        throw FileNotFoundException(
-            "The file '${propertiesFile.absolutePath}' could not be found"
-        )
+//        throw FileNotFoundException(
+//            "The file '${propertiesFile.absolutePath}' could not be found"
+//        )
+        return null
     }
     // Load contents into properties object
     val properties = Properties()

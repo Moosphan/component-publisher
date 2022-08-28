@@ -116,9 +116,19 @@ class ComponentUploadPlugin : Plugin<Project> {
         }
         // Select publish options first, if parameter is empty, use `local.properties` instead.
         val defaultProperties = project.rootProject.loadPropertiesFile()
-        userName = userName.takeIfBlank { defaultProperties.getProperty(Constants.REPOSITORY_USERNAME_KEY) }
-        password = password.takeIfBlank { defaultProperties.getProperty(Constants.REPOSITORY_PASSWORD_KEY) }
-        releaseRepoUrl = releaseRepoUrl.takeIfBlank { defaultProperties.getProperty(Constants.REPOSITORY_RELEASE_URL) }
-        snapshotRepoUrl = snapshotRepoUrl.takeIfBlank { defaultProperties.getProperty(Constants.REPOSITORY_SNAPSHOT_URL) }
+        defaultProperties?.run {
+            userName = userName.takeIfBlank { getProperty(Constants.REPOSITORY_USERNAME_KEY) }
+            password = password.takeIfBlank { getProperty(Constants.REPOSITORY_PASSWORD_KEY) }
+            releaseRepoUrl = releaseRepoUrl.takeIfBlank { getProperty(Constants.REPOSITORY_RELEASE_URL) }
+            snapshotRepoUrl = snapshotRepoUrl.takeIfBlank { getProperty(Constants.REPOSITORY_SNAPSHOT_URL) }
+        }
+        if (version.checkIfLocalVersion()) {
+            return
+        }
+        // If not local version, you must specify the required repo info.
+        check(userName.isNotEmpty() && password.isNotEmpty()
+                && (releaseRepoUrl.isNotEmpty() || snapshotRepoUrl.isNotEmpty())) {
+            "If not publish a LOCAL version, you must specify repo info, e.g, username|password|repoUrls."
+        }
     }
 }
