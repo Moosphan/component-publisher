@@ -35,7 +35,6 @@ data class KotlinJsPublication @JvmOverloads constructor(
     override fun setupPublication(project: Project, configure: MavenPublication.() -> Unit) {
         // Create publication, since Kotlin/JS doesn't provide one by default.
         // https://youtrack.jetbrains.com/issue/KT-41582
-        println("====> setupPublication of kt-js lib.")
         project.run {
             publications?.create(defaultMavenPublication, MavenPublication::class.java) {
                 configure()

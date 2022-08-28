@@ -33,12 +33,10 @@ data class KotlinLibraryPublication @JvmOverloads constructor(
 ) : PlatformPublication() {
 
     override fun setupPublication(project: Project, configure: MavenPublication.() -> Unit) {
-        println("====> setupPublication of kt jvm lib.")
         project.run {
             publications?.create(defaultMavenPublication, MavenPublication::class.java) {
                 configure()
                 from(components["java"])
-                println("====> configure sourceJar")
                 withSourcesJar(javaSourceJarTask(packSourceJar))
                 withJavadocJar(javadocJarTask(javadocOptions))
             }

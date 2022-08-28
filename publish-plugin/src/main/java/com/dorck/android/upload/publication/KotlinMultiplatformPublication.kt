@@ -27,7 +27,6 @@ data class KotlinMultiplatformPublication @JvmOverloads constructor(
         get() = false
 
     override fun setupPublication(project: Project, configure: MavenPublication.() -> Unit) {
-        println("====> setupPublication of kt multi lib.")
         project.run {
             publications?.withType(MavenPublication::class.java)?.all {
                 configure()

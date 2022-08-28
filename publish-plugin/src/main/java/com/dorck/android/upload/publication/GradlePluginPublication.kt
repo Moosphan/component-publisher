@@ -33,10 +33,8 @@ data class GradlePluginPublication @JvmOverloads constructor(
     override fun setupPublication(project: Project, configure: MavenPublication.() -> Unit) {
         project.run {
             publications?.withType(MavenPublication::class.java)?.all {
-                println("====> setupPublication of Gradle lib.")
                 configure()
                 if (name == "pluginMaven") {
-                    println("====> start config artifact task of Gradle lib.")
                     withSourcesJar(javaSourceJarTask(packSourceJar))
                     withJavadocJar(javadocJarTask(javadocOptions))
                 }

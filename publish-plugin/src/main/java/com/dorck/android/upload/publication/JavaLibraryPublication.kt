@@ -34,7 +34,6 @@ data class JavaLibraryPublication @JvmOverloads constructor(
 ) : PlatformPublication() {
 
     override fun setupPublication(project: Project, configure: MavenPublication.() -> Unit) {
-        println("====> setupPublication of Java lib.")
         project.run {
             publications?.create(defaultMavenPublication, MavenPublication::class.java) {
                 configure()

@@ -133,9 +133,6 @@ internal fun Project.loadPropertiesFile(fileName: String = "local.properties"): 
     // Load file
     val propertiesFile = file(fileName)
     if (!propertiesFile.exists()) {
-//        throw FileNotFoundException(
-//            "The file '${propertiesFile.absolutePath}' could not be found"
-//        )
         return null
     }
     // Load contents into properties object
@@ -206,7 +203,6 @@ private fun Project.getDefaultBuildType(): String {
             return defaultBuildType
         }
         buildTypes.forEach {
-            println("===> buildType: ${it.name}")
             if (it.name == "release") {
                 return defaultBuildType
             }

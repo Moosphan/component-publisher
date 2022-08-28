@@ -47,7 +47,6 @@ data class AndroidLibrarySingleVariantPublication(
     override val javadocOptions: JavadocJarOptions = JavadocJarOptions.None()
 
     override fun setupPublication(project: Project, configure: MavenPublication.() -> Unit) {
-        println("====> setupPublication of Android lib.")
         project.run {
             repositories {
                 google()
