@@ -20,7 +20,7 @@
 
 - Publish components easily without any complex configs.
 - Support multi type components. e.g, Java library, android library, kotlin lib, gradle lib etc.
-- Support publishing libraries into local repos/release repos/snapshot repos or Github packages.
+- Support publishing libraries into local repos, release repos, snapshot repos or Github packages.
 - Safely configure your sensitive credentials in `local.properties`.
 
 ## Getting Started
@@ -90,7 +90,7 @@ REPO_RELEASE_URL=https://maven.xx.xx/repository/releases/
 REPO_SNAPSHOT_URL=https://maven.xx.xx/repository/snapshots/
 ```
 
-> If you want to specify repo options for a component, just add repo info in its `build.gradle` >> `publishOptions` DSL.
+> **Note**: If you want to specify repo options for a component, just add repo info in its `build.gradle` >> `publishOptions` DSL.
 
 ### Article Reference
 
