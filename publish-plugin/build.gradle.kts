@@ -147,7 +147,7 @@ object PluginInfo {
     const val group = "cn.dorck"
     const val artifactId = "component-publisher"
     const val implementationClass = "com.dorck.android.upload.ComponentUploadPlugin"
-    const val version = "1.0.2"
+    const val version = "1.0.3"
     const val displayName = "Upload library for Android"
     const val description = "Gradle plugin to publish library component quickly."
     const val url = "https://github.com/Moosphan/component-publisher.git"
