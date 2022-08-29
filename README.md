@@ -19,8 +19,8 @@
 ## Features
 
 - Publish components easily without any complex configs.
-- Support multi type components. e.g, Java library, android library, kotlin lib, gradle lib etc.
-- Support publishing libraries into local repos, release repos, snapshot repos or Github packages.
+- Support multi type components. e.g, Java library, Android library, Kotlin lib, Gradle lib etc.
+- Support publishing libraries into local repos, [Sonatype](https://central.sonatype.org) release/snapshot repos or [Github packages](https://docs.github.com/en/packages).
 - Safely configure your sensitive credentials in `local.properties`.
 
 ## Getting Started
