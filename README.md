@@ -14,7 +14,7 @@
 - [x] Improvement of usage doc.
 - [ ] Run the publication task with options by project properties.
 - [ ] Support signing artifacts before publishing.
-- [ ] Import GitHub Actions for automatically publishing.
+- [x] Import GitHub Actions for automatically publishing.
 
 ## Features
 
@@ -32,7 +32,7 @@ You need apply `cn.dorck.component.publisher` in `build.gradle`:
 
 ```kotlin
 plugins {
-  id("cn.dorck.component.publisher") version "1.0.0"
+  id("cn.dorck.component.publisher") version "1.0.2"
 }
 ```
 
