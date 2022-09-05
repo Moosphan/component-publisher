@@ -10,8 +10,8 @@ pluginManagement {
     }
     /*resolutionStrategy {
         eachPlugin {
-            if (requested.id.id == 'cn.dorck.android.publisher') {
-                useModule("cn.dorck:component-publisher:1.0.0-LOCAL")
+            if (requested.id.id == 'component-publisher') {
+                useModule("cn.dorck.android:component-publisher:1.0.0")
             }
         }
     }*/
