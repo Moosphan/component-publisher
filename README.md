@@ -8,13 +8,14 @@
 >
 > *You can find the latest released plugin on [Gradle Plugin Portal](https://plugins.gradle.org/plugin/cn.dorck.component.publisher).*
 
-## Todo
+## Todo & Progress
 
 - [x] Publish this plugin onto gradle plugin portal.
 - [x] Improvement of usage doc.
 - [ ] Run the publication task with options by project properties.
 - [ ] Support signing artifacts before publishing.
 - [x] Import GitHub Actions for automatically publishing.
+- [ ] Use TestKit to test functions of Gradle plugin.
 
 ## Features
 
