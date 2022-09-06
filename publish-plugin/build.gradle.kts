@@ -46,6 +46,10 @@ java {
 group = PluginInfo.group
 version = PluginInfo.version
 
+// Create a source set for functional test.
+val functionalTestSourceSet: SourceSet by sourceSets.creating
+val functionalTestImplementation: Configuration by configurations.creating
+
 pluginBundle {
     website = "https://github.com/Moosphan/component-publisher"
     vcsUrl = "https://github.com/Moosphan/component-publisher.git"
@@ -63,6 +67,8 @@ gradlePlugin {
             description = PluginInfo.description
         }
     }
+    // We can use a custom source set for functional tests.
+    testSourceSets(functionalTestSourceSet)
 }
 
 dependencies {
@@ -75,6 +81,8 @@ dependencies {
     // Use JUnit test framework for unit tests
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))
+    testImplementation(gradleTestKit())
+    testImplementation("com.google.truth:truth:1.1.3")
 }
 
 afterEvaluate {
@@ -140,6 +148,45 @@ afterEvaluate {
 //signing {
 //    sign(publishing.publications)
 //}
+
+// Reconfigure the conventions for functional tests.
+// Refer to: https://docs.gradle.org/current/userguide/test_kit.html
+val functionalTestTask by tasks.registering(Test::class) {
+    group = "verification"
+    testClassesDirs = functionalTestSourceSet.output.classesDirs
+    classpath = functionalTestSourceSet.runtimeClasspath
+    useJUnitPlatform()
+}
+
+tasks.check {
+    dependsOn(functionalTestTask)
+}
+
+// Configure test suites for functional tests (An @Incubating feature since 7.3).
+// Refer to: https://docs.gradle.org/current/userguide/jvm_test_suite_plugin.html
+/*testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+        }
+        @Suppress("UnstableApiUsage")
+        register(JvmTestSuite::class) {
+            useKotlinTest()
+            useSpock()
+            dependencies {
+                implementation(project)
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
+}*/
 
 object PluginInfo {
     const val id = "cn.dorck.component.publisher"
