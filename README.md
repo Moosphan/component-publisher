@@ -4,8 +4,6 @@
 
  A Gradle plugin to easily publish components based on maven-publish. 
 
-> *Latest release version: **1.0.0***
->
 > *You can find the latest released plugin on [Gradle Plugin Portal](https://plugins.gradle.org/plugin/cn.dorck.component.publisher).*
 
 ## Todo & Progress
