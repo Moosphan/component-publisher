@@ -47,8 +47,9 @@ group = PluginInfo.group
 version = PluginInfo.version
 
 // Create a source set for functional test.
-val functionalTestSourceSet: SourceSet by sourceSets.creating
-val functionalTestImplementation: Configuration by configurations.creating
+val functionalTest: SourceSet by sourceSets.creating
+// Make `functionalTestImplementation` extends from `testImplementation` to use test dependencies directly.
+configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
 
 pluginBundle {
     website = "https://github.com/Moosphan/component-publisher"
@@ -68,7 +69,7 @@ gradlePlugin {
         }
     }
     // We can use a custom source set for functional tests.
-    testSourceSets(functionalTestSourceSet)
+    testSourceSets(functionalTest)
 }
 
 dependencies {
@@ -80,9 +81,10 @@ dependencies {
     compileOnly("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
     // Use JUnit test framework for unit tests
     testImplementation(kotlin("test"))
-    testImplementation(kotlin("test-junit"))
+//    testImplementation(kotlin("test-junit"))
     testImplementation(gradleTestKit())
     testImplementation("com.google.truth:truth:1.1.3")
+    "functionalTestImplementation"("org.junit.jupiter:junit-jupiter:5.7.2")
 }
 
 afterEvaluate {
@@ -153,8 +155,19 @@ afterEvaluate {
 // Refer to: https://docs.gradle.org/current/userguide/test_kit.html
 val functionalTestTask by tasks.registering(Test::class) {
     group = "verification"
-    testClassesDirs = functionalTestSourceSet.output.classesDirs
-    classpath = functionalTestSourceSet.runtimeClasspath
+    description = "Runs the functional tests."
+    mustRunAfter(tasks.named("test"))
+    testClassesDirs = functionalTest.output.classesDirs
+    classpath = functionalTest.runtimeClasspath
+    useJUnitPlatform()
+    beforeTest(
+        closureOf<TestDescriptor> {
+            logger.lifecycle("Running test: $this")
+        }
+    )
+}
+
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 

@@ -11,17 +11,18 @@ import com.google.common.truth.Truth.assertThat
  */
 class ComponentPublisherPluginTest {
 
-    fun `plugin registers test`() {
+    @Test
+    fun `plugin registers extension test`() {
         val project = ProjectBuilder.builder().build()
         project.plugins.apply("cn.dorck.component.publisher")
-        // Check if plugin extension and tasks registers succeed.
+        // Check if plugin extension registers succeed.
         assertThat(project.extensions.findByName("publishOptions")).isNotNull()
-        assertThat(project.tasks.findByName("publishComponent")).isNotNull()
     }
 
     @Test
-    fun `check for plugin extension`() {
+    fun `plugin registers task test`() {
         val project = ProjectBuilder.builder().build()
-
+        // Check if plugin tasks registers succeed.
+        assertThat(project.tasks.findByName("publishComponent")).isNotNull()
     }
 }
