@@ -20,7 +20,7 @@ import java.net.URI
 class ComponentUploadPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val moduleType = target.platformModule
-        println("===> start apply upload plugin with module type: $moduleType.")
+        //println("===> start apply upload plugin with module type: $moduleType.")
         // Skip application module.
         if (target.isAndroidApp()) {
             return
