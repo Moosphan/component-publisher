@@ -1,6 +1,7 @@
 package cn.dorck.publisher.test
 
 import cn.dorck.publisher.test.extensions.AgpVersionMapping
+import cn.dorck.publisher.test.extensions.LibraryType
 import cn.dorck.publisher.test.extensions.createIfNotExist
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
@@ -36,25 +37,37 @@ class ComponentsPublicationFunctionalTest {
 
     @Test
     fun `publish Java component to maven local with AGP 3_6`() {
-        val buildResult = publishLibraryToMavenLocal(AgpVersionMapping.AGP_3_6_0.gradleVersion)
+        val buildResult = publishLibraryToMavenLocal(LibraryType.Java, AgpVersionMapping.AGP_3_6_0.gradleVersion)
         assertPublishSucceed(buildResult)
     }
 
     @Test
     fun `publish Java component to maven local with AGP 4_0_0`() {
-        val buildResult = publishLibraryToMavenLocal(AgpVersionMapping.AGP_4_0_0.gradleVersion)
+        val buildResult = publishLibraryToMavenLocal(LibraryType.Java, AgpVersionMapping.AGP_4_0_0.gradleVersion)
         assertPublishSucceed(buildResult)
     }
 
     @Test
     fun `publish Java component to maven local with AGP 4_2_0`() {
-        val buildResult = publishLibraryToMavenLocal(AgpVersionMapping.AGP_4_2_0.gradleVersion)
+        val buildResult = publishLibraryToMavenLocal(LibraryType.Java, AgpVersionMapping.AGP_4_2_0.gradleVersion)
         assertPublishSucceed(buildResult)
     }
 
     @Test
     fun `publish Java component to maven local with AGP 7_1_0`() {
-        val buildResult = publishLibraryToMavenLocal(AgpVersionMapping.AGP_7_1_0.gradleVersion)
+        val buildResult = publishLibraryToMavenLocal(LibraryType.Java, AgpVersionMapping.AGP_7_1_0.gradleVersion)
+        assertPublishSucceed(buildResult)
+    }
+
+    @Test
+    fun `publish Kotlin component to maven local with AGP 7_2_0`() {
+        val buildResult = publishLibraryToMavenLocal(LibraryType.Kotlin, AgpVersionMapping.AGP_7_2_0.gradleVersion)
+        assertPublishSucceed(buildResult)
+    }
+
+    @Test
+    fun `publish Android component to maven local with AGP 7_2_0`() {
+        val buildResult = publishLibraryToMavenLocal(LibraryType.Android, AgpVersionMapping.AGP_7_2_0.gradleVersion)
         assertPublishSucceed(buildResult)
     }
 
@@ -63,40 +76,14 @@ class ComponentsPublicationFunctionalTest {
         assertTrue(result.output.contains(SUCCEED_MSG))
     }
 
-    private fun publishLibraryToMavenLocal(gradleVersion: String): BuildResult {
+    private fun publishLibraryToMavenLocal(libraryType: LibraryType, gradleVersion: String): BuildResult {
         if (!this::settingsFile.isInitialized || !this::buildFile.isInitialized) {
             throw FileNotFoundException("Cannot find `build.gradle` and `settings.gradle` file.")
         }
         settingsFile.writeText("")
-        buildFile.writeText("""
-            plugins {
-                id("java-library")
-                id("cn.dorck.component.publisher") version "1.0.4"
-            }
-
-            publishOptions {
-                group = "com.dorck.java"
-                version = "1.0.1-LOCAL"
-                artifactId = "java-sample-library"
-            }
-            
-            repositories {
-                mavenCentral()
-                google()
-            }
-        """.trimIndent())
+        buildFile.writeText(libraryType.buildTestContent)
         testProjectDir.run {
-            File(
-                this,
-                "src/main/java/cn/dorck/test/TestJavaClass.java"
-            ).createIfNotExist()
-            .writeText("""
-                public class TestJavaClass {
-                    void doSomething() {
-                        System.out.println("java");
-                    }
-                }
-            """.trimIndent())
+            generateSourceFile(this, libraryType)
         }
         println("==> The temp project dir: ${testProjectDir.path}")
         return GradleRunner.create()
@@ -108,6 +95,52 @@ class ComponentsPublicationFunctionalTest {
             .forwardOutput()
             .build()
     }
+
+    private fun generateSourceFile(parent: File, libraryType: LibraryType): File =
+        when(libraryType) {
+            LibraryType.Java -> File(
+                parent,
+                "src/main/java/cn/dorck/test/TestJavaClass.java"
+            ).apply {
+                createIfNotExist().writeText("""
+                    public class TestJavaClass {
+                        void doSomething() {
+                            System.out.println("java");
+                        }
+                    }
+                """.trimIndent())
+            }
+            LibraryType.Kotlin -> File(
+                parent,
+                "src/main/kotlin/cn/dorck/test/TestKotlinClass.kt"
+            ).apply {
+                createIfNotExist().writeText("""
+                    class TestKotlinClass {
+                        fun doSomething() {
+                            println("kotlin ...")
+                        }
+                    }
+                """.trimIndent())
+            }
+
+            LibraryType.Android -> File(
+                parent,
+                "src/main/kotlin/cn/dorck/test/SimpleFragment.kt"
+            ).apply {
+                createIfNotExist().writeText("""
+                    package com.dorck.android.library.sample
+    
+                    import androidx.fragment.app.Fragment
+                    
+                    class SimpleFragment : Fragment() {
+                    
+                        fun getName() = "SimpleFragment"
+                    }
+                """.trimIndent())
+            }
+
+            else -> throw UnsupportedOperationException("Not supported yet")
+        }
 
     companion object {
         private const val SUCCEED_MSG = "Your component published succeed!"
