@@ -15,7 +15,6 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.jetbrains.dokka.gradle.DokkaTask
-import java.io.FileNotFoundException
 import java.util.*
 
 internal const val defaultMavenPublication = "maven"
@@ -48,7 +47,7 @@ val Project.platformModule: PlatformModule?
             PlatformModule.JAVA_LIBRARY
         plugins.hasPlugin("org.jetbrains.kotlin.jvm") ->
             PlatformModule.KOTLIN_LIBRARY
-        plugins.hasPlugin("java-gradle-plugin") ->
+        plugins.hasPlugin("java-gradle-plugin") -> // FIXME 2023/12/12 Publish gradle plugin cannot execute here.
             PlatformModule.GRADLE_PLUGIN
         plugins.hasPlugin("org.jetbrains.kotlin.js") ->
             PlatformModule.KOTLIN_JS_LIBRARY
